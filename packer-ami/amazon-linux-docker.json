@@ -1,0 +1,45 @@
+{
+  "builders": [{
+    "type": "amazon-ebs",
+    "region": "us-east-1",
+    "source_ami_filter": {
+      "filters": {
+        "name": "amzn2-ami-hvm-2.*-x86_64-gp2",
+        "virtualization-type": "hvm",
+        "root-device-type": "ebs"
+      },
+      "owners": ["137112412989"],
+      "most_recent": true
+    },
+    "instance_type": "t2.micro",
+    "ssh_username": "ec2-user",
+    "ami_name": "ami-linux-docker-v2"
+  }],
+
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "sudo yum update -y",
+        "sudo amazon-linux-extras enable docker",
+        "sudo yum install -y docker",
+        "sudo systemctl start docker",
+        "sudo systemctl enable docker"
+      ]
+    },
+    {
+      "type": "file",
+      "source": "{{user `ssh_public_key_path`}}",
+      "destination": "/tmp/custom_aws_key_devops.pub"
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "mkdir -p /home/ec2-user/.ssh",
+        "cat /tmp/custom_aws_key_devops.pub >> /home/ec2-user/.ssh/authorized_keys",
+        "chown -R ec2-user:ec2-user /home/ec2-user/.ssh",
+        "chmod 600 /home/ec2-user/.ssh/authorized_keys"
+      ]
+    }
+  ]
+}
