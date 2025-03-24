@@ -72,6 +72,6 @@ terraform plan
 🖼️ Screenshots
 
 - Screenshot 1: Packer creating the image
-![ Packer creating the image](./reference_docs/Screenshot 2025-03-24 at 8.45.24 AM.png)
+![ Packer creating the image](reference_docs/Screenshot 2025-03-24 at 8.45.24 AM.png)
 - Screenshot 2: Terraform output
-![ Terraform outputterr](./reference_docs/Screenshot 2025-03-24 at 9.14.03 AM.png)
+![ Terraform outputterr](reference_docs/Screenshot 2025-03-24 at 9.14.03 AM.png)
