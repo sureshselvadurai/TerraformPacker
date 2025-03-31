@@ -1,0 +1,63 @@
+{
+  "builders": [
+    {
+      "name": "ubuntu",
+      "type": "amazon-ebs",
+      "region": "us-east-1",
+      "source_ami_filter": {
+        "filters": {
+          "name": "ubuntu*-amd64-server-*",
+          "virtualization-type": "hvm",
+          "root-device-type": "ebs"
+        },
+        "owners": ["099720109477"],
+        "most_recent": true
+      },
+      "instance_type": "t2.micro",
+      "ssh_username": "ubuntu",
+      "ami_name": "ubuntu-docker-a10.1-{{timestamp}}",
+      "ami_description": "Ubuntu with Docker, Python 3.8+, and authorized SSH key"
+    }
+  ],
+
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "echo 'Waiting for apt locks to be released...'",
+        "while sudo lsof /var/lib/apt/lists/lock || sudo lsof /var/lib/dpkg/lock || sudo lsof /var/lib/dpkg/lock-frontend; do echo 'Lock file is in use. Waiting...'; sleep 2; done",
+        "sudo rm -f /var/lib/apt/lists/lock /var/lib/dpkg/lock /var/lib/dpkg/lock-frontend || true",
+        "sudo apt-get update -y",
+        "sudo apt-get install -y software-properties-common",
+        "sudo add-apt-repository -y ppa:deadsnakes/ppa",
+        "sudo apt-get update -y",
+        "sudo apt-get install -y python3.8 python3.8-venv python3.8-dev",
+        "sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 1",
+        "sudo update-alternatives --set python3 /usr/bin/python3.8",
+        "python3 --version"
+      ]
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "sudo apt-get install -y docker.io",
+        "sudo systemctl start docker",
+        "sudo systemctl enable docker"
+      ]
+    },
+    {
+      "type": "file",
+      "source": "/Users/sureshrajaselvadurai/.ssh/devops_a10.pub",
+      "destination": "/tmp/custom_aws_key_devops.pub"
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "mkdir -p /home/ubuntu/.ssh",
+        "cat /tmp/custom_aws_key_devops.pub >> /home/ubuntu/.ssh/authorized_keys",
+        "chown -R ubuntu:ubuntu /home/ubuntu/.ssh",
+        "chmod 600 /home/ubuntu/.ssh/authorized_keys"
+      ]
+    }
+  ]
+}

@@ -1,26 +1,40 @@
 {
-  "builders": [{
-    "type": "amazon-ebs",
-    "region": "us-east-1",
-    "source_ami_filter": {
-      "filters": {
-        "name": "amzn2-ami-hvm-2.*-x86_64-gp2",
-        "virtualization-type": "hvm",
-        "root-device-type": "ebs"
+  "builders": [
+    {
+      "name": "amazon-linux",
+      "type": "amazon-ebs",
+      "region": "us-east-1",
+      "source_ami_filter": {
+        "filters": {
+          "name": "amzn2-ami-hvm-2.*-x86_64-gp2",
+          "virtualization-type": "hvm",
+          "root-device-type": "ebs"
+        },
+        "owners": ["137112412989"],
+        "most_recent": true
       },
-      "owners": ["137112412989"],
-      "most_recent": true
-    },
-    "instance_type": "t2.micro",
-    "ssh_username": "ec2-user",
-    "ami_name": "ami-linux-docker-v2"
-  }],
+      "instance_type": "t2.micro",
+      "ssh_username": "ec2-user",
+      "ami_name": "ami-linux-docker-a10.1-{{timestamp}}",
+      "ami_description": "Amazon Linux 2 with Docker, Python 3.8, and authorized SSH key"
+    }
+  ],
 
   "provisioners": [
     {
       "type": "shell",
       "inline": [
         "sudo yum update -y",
+        "sudo amazon-linux-extras enable python3.8",
+        "sudo yum install -y python3.8",
+        "sudo alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 1",
+        "sudo alternatives --config python3 <<< '1'",
+        "python3 --version"
+      ]
+    },
+    {
+      "type": "shell",
+      "inline": [
         "sudo amazon-linux-extras enable docker",
         "sudo yum install -y docker",
         "sudo systemctl start docker",
@@ -29,7 +43,7 @@
     },
     {
       "type": "file",
-      "source": "{{user `ssh_public_key_path`}}",
+      "source": "/Users/sureshrajaselvadurai/.ssh/devops_a10.pub",
       "destination": "/tmp/custom_aws_key_devops.pub"
     },
     {
