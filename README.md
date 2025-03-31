@@ -129,3 +129,4 @@ ansible-playbook -i inventory.ini playbook.yaml
 ```
 
 Documentation report: [Assignment10_Documented_Report.pdf](reference_docs/Assignment10_Documented_Report.pdf)
+<embed src="https://github.com/sureshselvadurai/TerraformPacker/blob/multi_os_ec2_controlled_ansible/reference_docs/Assignment10_Documented_Report.pdf" width="800px" height="600px" />
